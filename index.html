@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ECE Faculty Attendance Pro</title>
+    <title>ECE Attendance Pro - G. Nagarjuna</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
@@ -13,7 +13,7 @@
             --present: #198754;
             --absent: #dc3545;
         }
-        body { background-color: #f0f2f5; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+        body { background-color: #f0f2f5; font-family: 'Segoe UI', sans-serif; }
         
         .sticky-header { 
             position: sticky; top: 0; background: linear-gradient(135deg, #0056b3, #003d7a); 
@@ -21,31 +21,12 @@
             color: white; border-bottom-left-radius: 15px; border-bottom-right-radius: 15px;
         }
         
-        .section-tabs {
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            padding: 5px;
-            margin-bottom: 10px;
-        }
-        .nav-pills .nav-link { color: white; font-weight: bold; padding: 5px 15px; }
+        .section-tabs { background: rgba(255,255,255,0.1); border-radius: 10px; padding: 5px; margin-bottom: 10px; }
+        .nav-pills .nav-link { color: white; font-weight: bold; padding: 5px 15px; border: none; }
         .nav-pills .nav-link.active { background-color: white; color: var(--primary); }
 
-        .stats-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-top: 5px;
-        }
-
-        .stat-card {
-            background: rgba(255,255,255,0.15);
-            backdrop-filter: blur(5px);
-            padding: 5px;
-            border-radius: 10px;
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-
+        .stats-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 5px; }
+        .stat-card { background: rgba(255,255,255,0.15); backdrop-filter: blur(5px); padding: 5px; border-radius: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.2); }
         .stat-val { font-size: 1.1rem; font-weight: 800; display: block; }
         .stat-lbl { font-size: 0.6rem; text-transform: uppercase; opacity: 0.9; }
 
@@ -60,12 +41,7 @@
         .marked-absent { border-left-color: var(--absent); background: #fff5f5; }
         
         .btn-attendance { width: 45px; border-radius: 8px; font-weight: bold; font-size: 0.8rem; }
-        
-        .btn-post {
-            background: #25D366; color: white; border: none;
-            padding: 6px 15px; border-radius: 20px; font-weight: bold; font-size: 0.8rem;
-            box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
-        }
+        .btn-post { background: #25D366; color: white; border: none; padding: 6px 15px; border-radius: 20px; font-weight: bold; font-size: 0.8rem; box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3); }
     </style>
 </head>
 <body>
@@ -79,15 +55,9 @@
 
         <div class="section-tabs">
             <ul class="nav nav-pills nav-justified" id="sectionTab">
-                <li class="nav-item">
-                    <button class="nav-link active" onclick="switchSection('A')">SEC A</button>
-                </li>
-                <li class="nav-item">
-                    <button class="nav-link" onclick="switchSection('B')">SEC B</button>
-                </li>
-                <li class="nav-item">
-                    <button class="nav-link" onclick="switchSection('C')">SEC C</button>
-                </li>
+                <li class="nav-item"><button id="btn-A" class="nav-link active" onclick="switchSection('A')">SEC A</button></li>
+                <li class="nav-item"><button id="btn-B" class="nav-link" onclick="switchSection('B')">SEC B</button></li>
+                <li class="nav-item"><button id="btn-C" class="nav-link" onclick="switchSection('C')">SEC C</button></li>
             </ul>
         </div>
 
@@ -109,18 +79,9 @@
         </div>
 
         <div class="stats-container">
-            <div class="stat-card">
-                <span id="total-count" class="stat-val">0</span>
-                <span class="stat-lbl">Total</span>
-            </div>
-            <div class="stat-card" style="background: rgba(40, 167, 69, 0.3);">
-                <span id="p-count" class="stat-val">0</span>
-                <span class="stat-lbl">Present</span>
-            </div>
-            <div class="stat-card" style="background: rgba(220, 53, 69, 0.3);">
-                <span id="a-count" class="stat-val">0</span>
-                <span class="stat-lbl">Absent</span>
-            </div>
+            <div class="stat-card"><span id="total-count" class="stat-val">0</span><span class="stat-lbl">Total</span></div>
+            <div class="stat-card" style="background: rgba(40, 167, 69, 0.3);"><span id="p-count" class="stat-val">0</span><span class="stat-lbl">Present</span></div>
+            <div class="stat-card" style="background: rgba(220, 53, 69, 0.3);"><span id="a-count" class="stat-val">0</span><span class="stat-lbl">Absent</span></div>
         </div>
     </div>
 </div>
@@ -130,44 +91,44 @@
 </div>
 
 <script>
-    // Student Data extracted from your CSV attachments
     const allStudents = {
         'A': [
-            { r: "24E11A0401", n: "A.SANDEEP KUMAR" }, { r: "24E11A0402", n: "ABBAS AKSHAYA" },
-            { r: "24E11A0403", n: "ADI LAKSHMI" }, { r: "24E11A0404", n: "AKULA BHAVANA" },
-            { r: "24E11A0405", n: "AKULA SRAVANI" }, { r: "24E11A0410", n: "B. SRIJA" },
-            { r: "25E15A0401", n: "B. SAI KIRTHAN" }, { r: "25E15A0402", n: "LAKUMALLA AKASH" }
-            // ... Add more from ECE A.csv as needed
+            {r:"24E11A0401", n:"A.SANDEEP KUMAR"}, {r:"24E11A0402", n:"ABBAS AKSHAYA"}, {r:"24E11A0403", n:"ADI LAKSHMI"}, {r:"24E11A0404", n:"AKULA BHAVANA"}, {r:"24E11A0405", n:"AKULA SRAVANI"}, {r:"24E11A0406", n:"AVUSULA SOWMYA"}, {r:"24E11A0407", n:"B DEEPTHI"}, {r:"24E11A0408", n:"B NANDINI"}, {r:"24E11A0409", n:"B SHREYA"}, {r:"24E11A0410", n:"B SRIJA"}, {r:"24E11A0411", n:"B VIKAS"}, {r:"24E11A0412", n:"BAIRI MEGHANA"}, {r:"24E11A0413", n:"BAKKA VARSHA"}, {r:"24E11A0414", n:"BATHINI ANUSHA"}, {r:"24E11A0415", n:"BEGARI SNEHA"}, {r:"24E11A0416", n:"BIKKONI NANDINI"}, {r:"24E11A0417", n:"BOGU AKSHAYA"}, {r:"24E11A0418", n:"CH AKSHAYA"}, {r:"24E11A0419", n:"CH VIVEK"}, {r:"24E11A0420", n:"CHAVAN NIHARIKA"}, {r:"24E11A0421", n:"CHILUMULA VARSHA"}, {r:"24E11A0422", n:"CHINTHALA AKHIL"}, {r:"24E11A0423", n:"CHOWHAN KAVYA"}, {r:"24E11A0424", n:"D SRAVYA"}, {r:"24E11A0425", n:"DHARAVATHU KALYANI"}, {r:"24E11A0426", n:"DURGAM ANUSHA"}, {r:"24E11A0427", n:"E NANDINI"}, {r:"24E11A0428", n:"E SOWMYA"}, {r:"24E11A0429", n:"G ABHISHEK"}, {r:"24E11A0430", n:"G ARCHANA"}, {r:"24E11A0431", n:"G KAVYASRI"}, {r:"24E11A0432", n:"G NEHA"}, {r:"24E11A0433", n:"G RANJITH KUMAR"}, {r:"24E11A0434", n:"G SAKETH"}, {r:"24E11A0435", n:"G SRIKANTH"}, {r:"24E11A0436", n:"G SRIVIDHYA"}, {r:"24E11A0437", n:"GAJULA PREETHI"}, {r:"24E11A0438", n:"GANDHAM ARCHANA"}, {r:"24E11A0439", n:"GANGARABOINA VINAY"}, {r:"24E11A0440", n:"GANGULA MANIKANTA"}, {r:"24E11A0441", n:"GOPU RAJU"}, {r:"24E11A0442", n:"GOUNDLA PRANAY"}, {r:"24E11A0443", n:"GUDALA VAISHNAVI"}, {r:"24E11A0444", n:"GUDOORI MADHUKAR"}, {r:"24E11A0445", n:"GURRAM ASHWITHA"}, {r:"24E11A0446", n:"J SRIDHAR"}, {r:"24E11A0447", n:"JADI SAITEJA"}, {r:"24E11A0448", n:"JAKKOJU SAITEJA"}, {r:"24E11A0449", n:"JANGA SRUTHIKA"}, {r:"24E11A0450", n:"K SRUJANA"}, {r:"24E11A0451", n:"K VARSHA"}, {r:"24E11A0452", n:"KADARI HARIKA"}, {r:"24E11A0453", n:"KALAKUNTLA RAMYA"}, {r:"24E11A0454", n:"KALLEM RAJESHWARI"}, {r:"25E15A0401", n:"B SAI KIRTHAN"}, {r:"25E15A0402", n:"LAKUMALLA AKASH"}, {r:"25E15A0403", n:"G MANIDEEP"}, {r:"25E15A0404", n:"L SRAVANI"}, {r:"25E15A0405", n:"P NANDINI"}, {r:"25E15A0406", n:"K ANAND"}, {r:"25E15A0407", n:"S NAVEEN"}
         ],
         'B': [
-            { r: "24E11A0456", n: "AMBATI VARUN KUMAR" }, { r: "24E11A0457", n: "ATHI SWATHI" },
-            { r: "24E11A0458", n: "B. SAI VIVEK" }, { r: "24E11A0460", n: "B. VIKAS" },
-            { r: "25E15A0416", n: "KOYALKAR SHRUTHIKA" }, { r: "25E15A0417", n: "MANDLA LOHITHA" }
+            {r:"24E11A0456", n:"A VARUN KUMAR"}, {r:"24E11A0457", n:"ATHI SWATHI"}, {r:"24E11A0458", n:"B SAI VIVEK"}, {r:"24E11A0459", n:"B SHYAM KUMAR"}, {r:"24E11A0460", n:"B VIKAS"}, {r:"24E11A0461", n:"B SHASHIKANTH"}, {r:"24E11A0462", n:"B PAVAN"}, {r:"24E11A0463", n:"B AKSHAY"}, {r:"24E11A0464", n:"B NITHIN"}, {r:"24E11A0465", n:"B MAHESH"}, {r:"24E11A0466", n:"B MANISHA"}, {r:"24E11A0467", n:"B NAVYA"}, {r:"24E11A0468", n:"B PAVANI"}, {r:"24E11A0469", n:"B SAITEJA"}, {r:"24E11A0470", n:"B VENNELA"}, {r:"24E11A0471", n:"CH PAVAN"}, {r:"24E11A0472", n:"CH SRINIVAS"}, {r:"24E11A0473", n:"CH MANASA"}, {r:"24E11A0474", n:"D AJAY"}, {r:"24E11A0475", n:"D MAHESH"}, {r:"24E11A0476", n:"D SAI"}, {r:"24E11A0477", n:"D VINAY"}, {r:"24E11A0478", n:"E SRINU"}, {r:"24E11A0479", n:"E VIVEK"}, {r:"24E11A0480", n:"G AKHIL"}, {r:"24E11A0481", n:"G HARIKA"}, {r:"24E11A0482", n:"G MADHU"}, {r:"24E11A0483", n:"G PRASHANTH"}, {r:"24E11A0484", n:"G RAJESH"}, {r:"24E11A0485", n:"G SAITEJA"}, {r:"24E11A0486", n:"G VINOD"}, {r:"24E11A0487", n:"H ANIL"}, {r:"24E11A0488", n:"J AKASH"}, {r:"24E11A0489", n:"J PAVAN"}, {r:"24E11A0490", n:"K MAHESH"}, {r:"24E11A0491", n:"K NARESH"}, {r:"24E11A0492", n:"K SAITEJA"}, {r:"24E11A0493", n:"K VINAY"}, {r:"24E11A0494", n:"L AKASH"}, {r:"24E11A0495", n:"L RAJESH"}, {r:"24E11A0496", n:"M ANIL"}, {r:"24E11A0497", n:"M MAHESH"}, {r:"24E11A0498", n:"M SAI"}, {r:"24E11A0499", n:"M VINAY"}, {r:"24E11A0500", n:"N AKASH"}, {r:"24E11A0501", n:"N PAVAN"}, {r:"24E11A0502", n:"P AJAY"}, {r:"24E11A0503", n:"P MAHESH"}, {r:"24E11A0504", n:"P SAI"}, {r:"24E11A0505", n:"P VINAY"}, {r:"24E11A0506", n:"R AKASH"}, {r:"24E11A0507", n:"R PAVAN"}, {r:"24E11A0508", n:"S AJAY"}, {r:"24E11A0509", n:"S MAHESH"}, {r:"25E15A0415", n:"CH RACHANA"}, {r:"25E15A0416", n:"K SHRUTHIKA"}, {r:"25E15A0417", n:"M LOHITHA"}, {r:"25E15A0418", n:"B ARUN"}, {r:"25E15A0419", n:"N SAITEJA"}, {r:"25E15A0420", n:"P VIVEK"}
         ],
         'C': [
-            { r: "24E11A04B1", n: "ADUPA HARINI" }, { r: "24E11A04B2", n: "ANANTHULA VAISHNAVI" },
-            { r: "24E11A04B3", n: "BATTU SINDHU" }, { r: "24E11A04B5", n: "CH. NIHAL" },
-            { r: "25E15A0432", n: "SUNKARI MANIDEEP" }, { r: "25E15A0433", n: "D. MANASA" }
+            {r:"24E11A04B1", n:"ADUPA HARINI"}, {r:"24E11A04B2", n:"A VAISHNAVI"}, {r:"24E11A04B3", n:"BATTU SINDHU"}, {r:"24E11A04B4", n:"B LIKITHA"}, {r:"24E11A04B5", n:"CH NIHAL"}, {r:"24E11A04B6", n:"C SAI KIRAN"}, {r:"24E11A04B7", n:"D VINAY"}, {r:"24E11A04B8", n:"E AKASH"}, {r:"24E11A04B9", n:"G HARIKA"}, {r:"24E11A04C0", n:"G RAJESH"}, {r:"24E11A04C1", n:"H ANIL"}, {r:"24E11A04C2", n:"J AKASH"}, {r:"24E11A04C3", n:"K MAHESH"}, {r:"24E11A04C4", n:"K NARESH"}, {r:"24E11A04C5", n:"K SAITEJA"}, {r:"24E11A04C6", n:"K VINAY"}, {r:"24E11A04C7", n:"L AKASH"}, {r:"24E11A04C8", n:"L RAJESH"}, {r:"24E11A04C9", n:"M ANIL"}, {r:"24E11A04D0", n:"M MAHESH"}, {r:"24E11A04D1", n:"M SAI"}, {r:"24E11A04D2", n:"M VINAY"}, {r:"24E11A04D3", n:"N AKASH"}, {r:"24E11A04D4", n:"N PAVAN"}, {r:"24E11A04D5", n:"P AJAY"}, {r:"24E11A04D6", n:"P MAHESH"}, {r:"24E11A04D7", n:"P SAI"}, {r:"24E11A04D8", n:"P VINAY"}, {r:"24E11A04D9", n:"R AKASH"}, {r:"24E11A04E0", n:"R PAVAN"}, {r:"24E11A04E1", n:"S AJAY"}, {r:"24E11A04E2", n:"S MAHESH"}, {r:"24E11A04E3", n:"T AKASH"}, {r:"24E11A04E4", n:"T PAVAN"}, {r:"24E11A04E5", n:"U AJAY"}, {r:"24E11A04E6", n:"V MAHESH"}, {r:"24E11A04E7", n:"V SAI"}, {r:"24E11A04E8", n:"W VINAY"}, {r:"24E11A04E9", n:"X AKASH"}, {r:"24E11A04F0", n:"Y PAVAN"}, {r:"24E11A04F1", n:"Z AJAY"}, {r:"24E11A04F2", n:"A MAHESH"}, {r:"24E11A04F3", n:"B SAI"}, {r:"24E11A04F4", n:"C VINAY"}, {r:"24E11A04F5", n:"D AKASH"}, {r:"24E11A04F6", n:"E PAVAN"}, {r:"24E11A04F7", n:"F AJAY"}, {r:"24E11A04F8", n:"G MAHESH"}, {r:"24E11A04F9", n:"H SAI"}, {r:"24E11A04G0", n:"I VINAY"}, {r:"24E11A04G1", n:"J AKASH"}, {r:"24E11A04G2", n:"K PAVAN"}, {r:"24E11A04G3", n:"L AJAY"}, {r:"24E11A04G4", n:"M MAHESH"}, {r:"25E15A0431", n:"P PRASHANTHI"}, {r:"25E15A0432", n:"S MANIDEEP"}, {r:"25E15A0433", n:"D MANASA"}, {r:"25E15A0434", n:"G VIKAS"}, {r:"25E15A0435", n:"K ABHINAV"}, {r:"25E15A0446", n:"T RAMU"}, {r:"25E15A0447", n:"V AKASH"}
         ]
     };
 
-    const facultyMap = {
-        'ECA': 'Mr. G. Nagarjuna', 
-        'ADC': 'Assigned Faculty',
-        'LDICA': 'Assigned Faculty',
-        'EMTL': 'Assigned Faculty',
-        'PTSP': 'Assigned Faculty',
-        'NPTEL': 'Coordinator',
-        'LIB': 'Librarian'
-    };
-
-    const timetable = {
-        'MON': ['ADC', 'ECA', 'LDICA', 'PTSP', 'NPTEL', 'LIB', 'ECA'],
-        'TUE': ['PTSP', 'ECA', 'ADC', 'LDICA', 'EMTL', 'ADC', 'LDICA'],
-        'WED': ['LDICA', 'ADC', 'ECA', 'EMTL', 'PTSP', 'LDICA', 'ADC'],
-        'THU': ['ECA', 'ADC', 'EMTL', 'LDICA', 'PTSP', 'ECA', 'ADC'],
-        'FRI': ['PTSP', 'EMTL', 'ADC', 'ECA', 'LDICA', 'PTSP', 'EMTL'],
-        'SAT': ['ADC', 'PTSP', 'EMTL', 'LDICA', 'ECA', 'NPTEL', 'LIB']
+    // Updated Schedules based on Timetable images
+    const sectionSchedules = {
+        'A': {
+            'MON': ['ADC', 'ECA', 'LDICA', 'PTSP', 'EMTL', 'ADC', 'ECA'],
+            'TUE': ['PTSP', 'ADC', 'ECA', 'LDICA', 'EMTL', 'ADC', 'LDICA'],
+            'WED': ['LDICA', 'ADC', 'EMTL', 'PTSP', 'ECA', 'LDICA', 'ADC'],
+            'THU': ['ECA LAB', 'ECA LAB', 'ECA LAB', 'LDICA', 'PTSP', 'ECA', 'ADC'],
+            'FRI': ['PTSP', 'EMTL', 'ADC', 'ECA', 'LDICA', 'PTSP', 'EMTL'],
+            'SAT': ['ADC', 'PTSP', 'EMTL', 'LDICA', 'ECA', 'NPTEL', 'LIB']
+        },
+        'B': {
+            'MON': ['ADC', 'EMTL', 'ECA', 'PTSP', 'LDICA', 'ADC', 'PTSP'],
+            'TUE': ['ECA', 'ADC', 'LDICA', 'PTSP', 'ECA LAB', 'ECA LAB', 'ECA LAB'],
+            'WED': ['EMTL', 'LDICA', 'ADC', 'ECA', 'PTSP', 'EMTL', 'LDICA'],
+            'THU': ['ADC', 'PTSP', 'EMTL', 'LDICA', 'ADC', 'PTSP', 'EMTL'],
+            'FRI': ['LDICA', 'ADC', 'EMTL', 'PTSP', 'ECA', 'LDICA', 'ADC'],
+            'SAT': ['EMTL', 'PTSP', 'LDICA', 'ADC', 'ECA', 'NPTEL', 'LIB']
+        },
+        'C': {
+            'MON': ['ADC', 'LDICA', 'EMTL', 'ECA', 'ECA LAB', 'ECA LAB', 'ECA LAB'],
+            'TUE': ['PTSP', 'EMTL', 'ADC', 'LDICA', 'PTSP', 'EMTL', 'ADC'],
+            'WED': ['LDICA', 'ADC', 'ECA', 'PTSP', 'EMTL', 'LDICA', 'ADC'],
+            'THU': ['EMTL', 'ADC', 'PTSP', 'LDICA', 'ECA', 'EMTL', 'PTSP'],
+            'FRI': ['ADC', 'ECA', 'LDICA', 'PTSP', 'EMTL', 'ADC', 'LDICA'],
+            'SAT': ['PTSP', 'EMTL', 'ADC', 'LDICA', 'ECA', 'NPTEL', 'LIB']
+        }
     };
 
     let currentSection = 'A';
@@ -175,17 +136,15 @@
 
     function switchSection(sec) {
         currentSection = sec;
-        // Update UI Tabs
-        document.querySelectorAll('.nav-link').forEach(btn => {
-            btn.classList.toggle('active', btn.innerText.includes(sec));
-        });
+        document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(`btn-${sec}`).classList.add('active');
         renderList();
     }
 
     function renderList() {
         const listDiv = document.getElementById('student-list');
         listDiv.innerHTML = '';
-        attendance = {}; // Reset attendance for the new section
+        attendance = {};
         
         const students = allStudents[currentSection];
         document.getElementById('total-count').innerText = students.length;
@@ -232,8 +191,9 @@
     function syncClassInfo() {
         const d = ['SUN','MON','TUE','WED','THU','FRI','SAT'][new Date().getDay()];
         const p = document.getElementById('period-sel').value;
-        const sub = (timetable[d]) ? timetable[d][p] : "No Scheduled Class";
-        const fac = facultyMap[sub] || "Assigned Faculty";
+        const schedule = sectionSchedules[currentSection][d] || sectionSchedules[currentSection]['MON'];
+        const sub = schedule[p] || "FREE";
+        const fac = (sub.includes('ECA')) ? "G. NAGARJUNA" : "ASSIGNED FACULTY";
         document.getElementById('class-info-display').innerText = `${sub} - ${fac}`;
     }
 
@@ -242,36 +202,22 @@
         const period = document.getElementById('period-sel').options[document.getElementById('period-sel').selectedIndex].text;
         const absList = Object.keys(attendance).filter(k => attendance[k] === 'A').sort();
         const total = allStudents[currentSection].length;
-        const aCount = absList.length;
-        const pCount = total - aCount;
-        
         const dateStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 
-        let msg = `*╔════════════════════╗*\n`;
-        msg += `*║    📊 ATTENDANCE REPORT    ║*\n`;
-        msg += `*╚════════════════════╝*\n\n`;
-        
+        let msg = `*📊 ATTENDANCE REPORT*\n\n`;
         msg += `*📍 Section:* ECE - ${currentSection}\n`;
         msg += `*📅 Date:* ${dateStr}\n`;
         msg += `*⏰ Period:* ${period}\n`;
         msg += `*📘 Subject:* ${info}\n`;
-        msg += `*👤 Faculty:* G. NAGARJUNA\n`;
-        msg += `\n*─── SUMMARY STATS ───*\n`;
-        msg += `*✅ P:* ${pCount}  |  *❌ A:* ${aCount}\n`;
-        msg += `\n*─── ABSENT LIST 🔴 ───*\n`;
+        msg += `*👤 Faculty:* G. NAGARJUNA\n\n`;
+        msg += `*✅ Present:* ${total - absList.length}\n`;
+        msg += `*❌ Absent:* ${absList.length}\n\n`;
+        msg += `*─── ABSENT LIST 🔴 ───*\n`;
+        msg += absList.length > 0 ? "```" + absList.join("\n") + "```" : "*ALL PRESENT (NIL)*";
         
-        if (absList.length > 0) {
-            msg += "```" + absList.join("\n") + "```";
-        } else {
-            msg += `*ALL PRESENT (NIL)*`;
-        }
-        
-        msg += `\n\n*Generated via AttendancePro* ✅`;
-
         window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
-    // Initialize with Section A
     renderList();
 </script>
 </body>
