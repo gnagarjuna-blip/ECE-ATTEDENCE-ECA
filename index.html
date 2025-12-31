@@ -37,7 +37,6 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
 
-        /* Container for spacing buttons (roughly 2 tabs width) */
         .attendance-actions {
             display: flex;
             gap: 40px; 
@@ -56,7 +55,7 @@
 <div class="sticky-header">
     <div class="container p-0">
         <div class="d-flex justify-content-between align-items-center mb-2">
-            <h6 class="mb-0 fw-bold">FACULTY: G. NAGARJUNA</h6>
+            <h6 class="mb-0 fw-bold">ATTENDANCE SYSTEM</h6>
             <button class="btn-post" onclick="sendToWhatsApp()">📤 POST REPORT</button>
         </div>
 
@@ -209,6 +208,7 @@
             {r:"25E15A0455", n:"I VAISHNAVI"}
         ]
     };
+
     const sectionSchedules = {
         'A': {
             'MON': ['ADC', 'ECA', 'LDICA', 'PTSP', 'EMTL', 'ADC', 'ECA'],
@@ -255,9 +255,9 @@
         document.getElementById('total-count').innerText = students.length;
 
         students.forEach(s => {
-            attendance[s.r] = 'P';
+            attendance[s.r] = 'P'; // Default status is Present
             const div = document.createElement('div');
-            div.className = 'roll-card marked-present';
+            div.className = 'roll-card marked-present'; // Default style is Present
             div.id = `card-${s.r}`;
             div.innerHTML = `
                 <div>
@@ -281,6 +281,8 @@
         const btns = card.querySelectorAll('button');
         card.classList.toggle('marked-present', status === 'P');
         card.classList.toggle('marked-absent', status === 'A');
+        
+        // Update button styles correctly
         btns[0].className = status === 'P' ? 'btn btn-success btn-attendance' : 'btn btn-outline-success btn-attendance';
         btns[1].className = status === 'A' ? 'btn btn-danger btn-attendance' : 'btn btn-outline-danger btn-attendance';
         updateStats();
@@ -294,16 +296,26 @@
     }
 
     function syncClassInfo() {
-        const d = ['SUN','MON','TUE','WED','THU','FRI','SAT'][new Date().getDay()];
+        const days = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+        const d = days[new Date().getDay()];
         const p = document.getElementById('period-sel').value;
         const schedule = sectionSchedules[currentSection][d] || sectionSchedules[currentSection]['MON'];
         const sub = schedule[p] || "FREE";
-        const fac = (sub.includes('ECA')) ? "G. NAGARJUNA" : "ASSIGNED FACULTY";
-        document.getElementById('class-info-display').innerText = `${sub} - ${fac}`;
+        
+        // LOGIC: ECA = Nagarjuna | ECA LAB for Sec A = Nagarjuna | Else = Assigned Faculty
+        let facultyName = "ASSIGNED FACULTY";
+        if (sub === 'ECA') {
+            facultyName = "G. NAGARJUNA";
+        } else if (sub === 'ECA LAB' && currentSection === 'A') {
+            facultyName = "G. NAGARJUNA";
+        }
+
+        document.getElementById('class-info-display').innerText = `${sub} - ${facultyName}`;
     }
 
     function sendToWhatsApp() {
-        const info = document.getElementById('class-info-display').innerText;
+        const classInfo = document.getElementById('class-info-display').innerText;
+        const [sub, faculty] = classInfo.split(" - ");
         const period = document.getElementById('period-sel').options[document.getElementById('period-sel').selectedIndex].text;
         const absList = Object.keys(attendance).filter(k => attendance[k] === 'A').sort();
         const total = allStudents[currentSection].length;
@@ -313,14 +325,13 @@
         msg += `*📍 Section:* ECE - ${currentSection}\n`;
         msg += `*📅 Date:* ${dateStr}\n`;
         msg += `*⏰ Period:* ${period}\n`;
-        msg += `*📘 Subject:* ${info}\n`;
-        msg += `*👤 Faculty:* G. NAGARJUNA\n\n`;
+        msg += `*📘 Subject:* ${sub}\n`;
+        msg += `*👤 Faculty:* ${faculty}\n\n`;
         msg += `*✅ Present:* ${total - absList.length}\n`;
         msg += `*❌ Absent:* ${absList.length}\n\n`;
         msg += `*─── ABSENT LIST 🔴 ───*\n`;
 
         if (absList.length > 0) {
-            // NEW LOGIC: Full roll number for prefix changes, otherwise last 3 digits
             let formattedList = [];
             let lastPrefix = "";
             for (let i = 0; i < absList.length; i++) {
@@ -329,14 +340,13 @@
                 let last3 = roll.substring(roll.length - 3);
                 
                 if (prefix !== lastPrefix) {
-                    formattedList.push(roll); // Show full number if prefix changes
+                    formattedList.push(roll);
                     lastPrefix = prefix;
                 } else {
-                    formattedList.push(last3); // Show only last 3 digits
+                    formattedList.push(last3);
                 }
             }
 
-            // Chunk into rows of 3
             let chunkedRows = [];
             for (let i = 0; i < formattedList.length; i += 3) {
                 let chunk = formattedList.slice(i, i + 3).join("   ");
@@ -350,6 +360,7 @@
         window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
+    // Initialize the app
     renderList();
 </script>
 </body>
