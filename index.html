@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ECE Faculty Attendance Pro</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #0056b3;
+            --present: #198754;
+            --absent: #dc3545;
+        }
+        body { background-color: #f0f2f5; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+        
+        .sticky-header { 
+            position: sticky; top: 0; background: linear-gradient(135deg, #0056b3, #003d7a); 
+            z-index: 1000; padding: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
+            color: white; border-bottom-left-radius: 15px; border-bottom-right-radius: 15px;
+        }
+        
+        .section-tabs {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+        .nav-pills .nav-link { color: white; font-weight: bold; padding: 5px 15px; }
+        .nav-pills .nav-link.active { background-color: white; color: var(--primary); }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(5px);
+            padding: 5px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .stat-val { font-size: 1.1rem; font-weight: 800; display: block; }
+        .stat-lbl { font-size: 0.6rem; text-transform: uppercase; opacity: 0.9; }
+
+        .roll-card { 
+            background: white; margin-bottom: 8px; border-radius: 12px; 
+            padding: 10px; display: flex; justify-content: space-between; 
+            align-items: center; border-left: 5px solid #ccc;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .marked-present { border-left-color: var(--present); background: #f0fff4; }
+        .marked-absent { border-left-color: var(--absent); background: #fff5f5; }
+        
+        .btn-attendance { width: 45px; border-radius: 8px; font-weight: bold; font-size: 0.8rem; }
+        
+        .btn-post {
+            background: #25D366; color: white; border: none;
+            padding: 6px 15px; border-radius: 20px; font-weight: bold; font-size: 0.8rem;
+            box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+<div class="sticky-header">
+    <div class="container p-0">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="mb-0 fw-bold">FACULTY: G. NAGARJUNA</h6>
+            <button class="btn-post" onclick="sendToWhatsApp()">📤 POST REPORT</button>
+        </div>
+
+        <div class="section-tabs">
+            <ul class="nav nav-pills nav-justified" id="sectionTab">
+                <li class="nav-item">
+                    <button class="nav-link active" onclick="switchSection('A')">SEC A</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" onclick="switchSection('B')">SEC B</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" onclick="switchSection('C')">SEC C</button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="row g-2">
+            <div class="col-4">
+                <select id="period-sel" class="form-select form-select-sm" onchange="syncClassInfo()">
+                    <option value="0">P-I (9:20)</option>
+                    <option value="1">P-II (10:10)</option>
+                    <option value="2">P-III (11:10)</option>
+                    <option value="3">P-IV (12:00)</option>
+                    <option value="4">P-V (1:30)</option>
+                    <option value="5">P-VI (2:20)</option>
+                    <option value="6">P-VII (3:10)</option>
+                </select>
+            </div>
+            <div class="col-8">
+                <div id="class-info-display" class="form-control form-control-sm bg-light fw-bold text-truncate" style="font-size: 0.75rem;">Loading...</div>
+            </div>
+        </div>
+
+        <div class="stats-container">
+            <div class="stat-card">
+                <span id="total-count" class="stat-val">0</span>
+                <span class="stat-lbl">Total</span>
+            </div>
+            <div class="stat-card" style="background: rgba(40, 167, 69, 0.3);">
+                <span id="p-count" class="stat-val">0</span>
+                <span class="stat-lbl">Present</span>
+            </div>
+            <div class="stat-card" style="background: rgba(220, 53, 69, 0.3);">
+                <span id="a-count" class="stat-val">0</span>
+                <span class="stat-lbl">Absent</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-3 pb-5">
+    <div id="student-list"></div>
+</div>
+
+<script>
+    // Student Data extracted from your CSV attachments
+    const allStudents = {
+        'A': [
+            { r: "24E11A0401", n: "A.SANDEEP KUMAR" }, { r: "24E11A0402", n: "ABBAS AKSHAYA" },
+            { r: "24E11A0403", n: "ADI LAKSHMI" }, { r: "24E11A0404", n: "AKULA BHAVANA" },
+            { r: "24E11A0405", n: "AKULA SRAVANI" }, { r: "24E11A0410", n: "B. SRIJA" },
+            { r: "25E15A0401", n: "B. SAI KIRTHAN" }, { r: "25E15A0402", n: "LAKUMALLA AKASH" }
+            // ... Add more from ECE A.csv as needed
+        ],
+        'B': [
+            { r: "24E11A0456", n: "AMBATI VARUN KUMAR" }, { r: "24E11A0457", n: "ATHI SWATHI" },
+            { r: "24E11A0458", n: "B. SAI VIVEK" }, { r: "24E11A0460", n: "B. VIKAS" },
+            { r: "25E15A0416", n: "KOYALKAR SHRUTHIKA" }, { r: "25E15A0417", n: "MANDLA LOHITHA" }
+        ],
+        'C': [
+            { r: "24E11A04B1", n: "ADUPA HARINI" }, { r: "24E11A04B2", n: "ANANTHULA VAISHNAVI" },
+            { r: "24E11A04B3", n: "BATTU SINDHU" }, { r: "24E11A04B5", n: "CH. NIHAL" },
+            { r: "25E15A0432", n: "SUNKARI MANIDEEP" }, { r: "25E15A0433", n: "D. MANASA" }
+        ]
+    };
+
+    const facultyMap = {
+        'ECA': 'Mr. G. Nagarjuna', 
+        'ADC': 'Assigned Faculty',
+        'LDICA': 'Assigned Faculty',
+        'EMTL': 'Assigned Faculty',
+        'PTSP': 'Assigned Faculty',
+        'NPTEL': 'Coordinator',
+        'LIB': 'Librarian'
+    };
+
+    const timetable = {
+        'MON': ['ADC', 'ECA', 'LDICA', 'PTSP', 'NPTEL', 'LIB', 'ECA'],
+        'TUE': ['PTSP', 'ECA', 'ADC', 'LDICA', 'EMTL', 'ADC', 'LDICA'],
+        'WED': ['LDICA', 'ADC', 'ECA', 'EMTL', 'PTSP', 'LDICA', 'ADC'],
+        'THU': ['ECA', 'ADC', 'EMTL', 'LDICA', 'PTSP', 'ECA', 'ADC'],
+        'FRI': ['PTSP', 'EMTL', 'ADC', 'ECA', 'LDICA', 'PTSP', 'EMTL'],
+        'SAT': ['ADC', 'PTSP', 'EMTL', 'LDICA', 'ECA', 'NPTEL', 'LIB']
+    };
+
+    let currentSection = 'A';
+    let attendance = {};
+
+    function switchSection(sec) {
+        currentSection = sec;
+        // Update UI Tabs
+        document.querySelectorAll('.nav-link').forEach(btn => {
+            btn.classList.toggle('active', btn.innerText.includes(sec));
+        });
+        renderList();
+    }
+
+    function renderList() {
+        const listDiv = document.getElementById('student-list');
+        listDiv.innerHTML = '';
+        attendance = {}; // Reset attendance for the new section
+        
+        const students = allStudents[currentSection];
+        document.getElementById('total-count').innerText = students.length;
+
+        students.forEach(s => {
+            attendance[s.r] = 'P';
+            const div = document.createElement('div');
+            div.className = 'roll-card marked-present';
+            div.id = `card-${s.r}`;
+            div.innerHTML = `
+                <div>
+                    <div class="fw-bold" style="font-size: 0.85rem; color: #004085;">${s.r}</div>
+                    <div class="text-muted" style="font-size: 0.7rem;">${s.n}</div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-success btn-attendance" onclick="mark('${s.r}','P')">P</button>
+                    <button class="btn btn-outline-danger btn-attendance" onclick="mark('${s.r}','A')">A</button>
+                </div>
+            `;
+            listDiv.appendChild(div);
+        });
+        updateStats();
+        syncClassInfo();
+    }
+
+    function mark(roll, status) {
+        attendance[roll] = status;
+        const card = document.getElementById(`card-${roll}`);
+        const btns = card.querySelectorAll('button');
+        card.classList.toggle('marked-present', status === 'P');
+        card.classList.toggle('marked-absent', status === 'A');
+        btns[0].className = status === 'P' ? 'btn btn-success btn-attendance' : 'btn btn-outline-success btn-attendance';
+        btns[1].className = status === 'A' ? 'btn btn-danger btn-attendance' : 'btn btn-outline-danger btn-attendance';
+        updateStats();
+    }
+
+    function updateStats() {
+        const total = allStudents[currentSection].length;
+        const abs = Object.values(attendance).filter(v => v === 'A').length;
+        document.getElementById('a-count').innerText = abs;
+        document.getElementById('p-count').innerText = total - abs;
+    }
+
+    function syncClassInfo() {
+        const d = ['SUN','MON','TUE','WED','THU','FRI','SAT'][new Date().getDay()];
+        const p = document.getElementById('period-sel').value;
+        const sub = (timetable[d]) ? timetable[d][p] : "No Scheduled Class";
+        const fac = facultyMap[sub] || "Assigned Faculty";
+        document.getElementById('class-info-display').innerText = `${sub} - ${fac}`;
+    }
+
+    function sendToWhatsApp() {
+        const info = document.getElementById('class-info-display').innerText;
+        const period = document.getElementById('period-sel').options[document.getElementById('period-sel').selectedIndex].text;
+        const absList = Object.keys(attendance).filter(k => attendance[k] === 'A').sort();
+        const total = allStudents[currentSection].length;
+        const aCount = absList.length;
+        const pCount = total - aCount;
+        
+        const dateStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+
+        let msg = `*╔════════════════════╗*\n`;
+        msg += `*║    📊 ATTENDANCE REPORT    ║*\n`;
+        msg += `*╚════════════════════╝*\n\n`;
+        
+        msg += `*📍 Section:* ECE - ${currentSection}\n`;
+        msg += `*📅 Date:* ${dateStr}\n`;
+        msg += `*⏰ Period:* ${period}\n`;
+        msg += `*📘 Subject:* ${info}\n`;
+        msg += `*👤 Faculty:* G. NAGARJUNA\n`;
+        msg += `\n*─── SUMMARY STATS ───*\n`;
+        msg += `*✅ P:* ${pCount}  |  *❌ A:* ${aCount}\n`;
+        msg += `\n*─── ABSENT LIST 🔴 ───*\n`;
+        
+        if (absList.length > 0) {
+            msg += "```" + absList.join("\n") + "```";
+        } else {
+            msg += `*ALL PRESENT (NIL)*`;
+        }
+        
+        msg += `\n\n*Generated via AttendancePro* ✅`;
+
+        window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    // Initialize with Section A
+    renderList();
+</script>
+</body>
+</html>
