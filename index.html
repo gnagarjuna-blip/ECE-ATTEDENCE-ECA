@@ -37,10 +37,10 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
 
-        /* --- NEW CSS FOR BUTTON SPACING --- */
+        /* Container to separate P and A buttons */
         .attendance-actions {
             display: flex;
-            gap: 40px; /* This creates the "2 tabs" space between P and A */
+            gap: 40px; /* Space between buttons */
             align-items: center;
         }
         
@@ -318,7 +318,20 @@
         msg += `*✅ Present:* ${total - absList.length}\n`;
         msg += `*❌ Absent:* ${absList.length}\n\n`;
         msg += `*─── ABSENT LIST 🔴 ───*\n`;
-        msg += absList.length > 0 ? "```" + absList.join("\n") + "```" : "*ALL PRESENT (NIL)*";
+
+        if (absList.length > 0) {
+            // Group roll numbers into groups of 3
+            let chunkedRows = [];
+            for (let i = 0; i < absList.length; i += 3) {
+                // Get 3 numbers and join them with space
+                let chunk = absList.slice(i, i + 3).join("  ");
+                chunkedRows.push(chunk);
+            }
+            // Join rows with new lines inside the code block
+            msg += "```" + chunkedRows.join("\n") + "```";
+        } else {
+            msg += "*ALL PRESENT (NIL)*";
+        }
         
         window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
     }
