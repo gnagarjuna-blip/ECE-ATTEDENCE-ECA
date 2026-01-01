@@ -220,12 +220,12 @@
             let formatted = [];
             let lastPrefix = "";
             absentRolls.forEach(r => {
-                let prefix = r.substring(0, r.length - 2);
+                let prefix = r.substring(0, r.length - 3);
                 if (prefix !== lastPrefix) { formatted.push(r); lastPrefix = prefix; }
-                else { formatted.push(r.substring(r.length - 2)); }
+                else { formatted.push(r.substring(r.length - 3)); }
             });
-            for(let i=0; i<formatted.length; i+=3) {
-                msg += "```" + formatted.slice(i, i+3).join("   ") + "```\n";
+            for(let i=0; i<formatted.length; i+=4) {
+                msg += "```" + formatted.slice(i, i+4).join("   ") + "```\n";
             }
         } else {
             msg += "*NIL (All Present)*";
