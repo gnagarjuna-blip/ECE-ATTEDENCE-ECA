@@ -85,9 +85,9 @@
 <script>
     // Schedules placeholder (will default to manual subject input)
     const schedules = {
-        'A': {'MON':['ADC','ECA','LDICA','PTSP','EMTL','ADC','ECA'],'TUE':['PTSP','ADC','ECA','LDICA','EMTL','ADC','LDICA'],'WED':['LDICA','ADC','EMTL','PTSP','ECA','LDICA','ADC'],'THU':['ECA LAB','ECA LAB','ECA LAB','LDICA','PTSP','ECA','ADC'],'FRI':['PTSP','EMTL','ADC','ECA','LDICA','PTSP','EMTL'],'SAT':['ADC','PTSP','EMTL','LDICA','ECA','NPTEL','LIB']},
-        'B': {'MON':['ADC','EMTL','ECA','PTSP','LDICA','ADC','PTSP'],'TUE':['ECA','ADC','LDICA','PTSP','ECA LAB','ECA LAB','ECA LAB'],'WED':['EMTL','LDICA','ADC','ECA','PTSP','EMTL','LDICA'],'THU':['ADC','PTSP','EMTL','LDICA','ADC','PTSP','EMTL'],'FRI':['LDICA','ADC','EMTL','PTSP','ECA','LDICA','ADC'],'SAT':['EMTL','PTSP','LDICA','ADC','ECA','NPTEL','LIB']},
-        'C': {'MON':['ADC','LDICA','EMTL','ECA','ECA LAB','ECA LAB','ECA LAB'],'TUE':['PTSP','EMTL','ADC','LDICA','PTSP','EMTL','ADC'],'WED':['LDICA','ADC','ECA','PTSP','EMTL','LDICA','ADC'],'THU':['EMTL','ADC','PTSP','LDICA','ECA','EMTL','PTSP'],'FRI':['ADC','ECA','LDICA','PTSP','EMTL','ADC','LDICA'],'SAT':['PTSP','EMTL','ADC','LDICA','ECA','NPTEL','LIB']}
+        'A': {'MON':['ADC','EMTL','LDICA','ECA','ECA Lab','ECA Lab','ADC'],'TUE':['PTSP','ADC','E','LDICA','EMTL','ECA','LDICA'],'WED':['ECA Lab','ECA Lab','EMTL','ECA','E','LDICA','ADC'],'THU':['E','E','E','LDICA','PTSP','U','ADC'],'FRI':['PTSP','EMTL','ADC','ECA','LDICA','PTSP','EMTL'],'SAT':['ADC','PTSP','EMTL','LDICA','E','NPTEL','LIB']},
+        'B': {'MON':['ECA','EMTL','E','PTSP','LDICA','ADC','PTSP'],'TUE':['E','ADC','LDICA','PTSP','E','E','E'],'WED':['EMTL','ECA','ADC','E','PTSP','EMTL','LDICA'],'THU':['ADC','ECA','EMTL','LDICA','ADC','PTSP','EMTL'],'FRI':['ECA','ADC','EMTL','PTSP','E','LDICA','ADC'],'SAT':['EMTL','PTSP','LDICA','ADC','E','NPTEL','LIB']},
+        'C': {'MON':['ADC','LDICA','ECA','E','E','E','ECA LAB'],'TUE':['PTSP','EMTL','ADC','LDICA','PTSP','EMTL','ADC'],'WED':['ECA','ADC','E','PTSP','EMTL','LDICA','ADC'],'THU':['EMTL','A','ECA','LDICA','E','EMTL','PTSP'],'FRI':['ADC','E','ECA','PTSP','EMTL','ADC','LDICA'],'SAT':['PTSP','EMTL','ADC','LDICA','A','NPTEL','LIB']}
     };
 
     // Full student database extracted from your CSV files
@@ -187,7 +187,7 @@
         // Faculty Logic
         let faculty = "ASSIGNED FACULTY";
         if (sub.includes("ECA")) faculty = "G. NAGARJUNA";
-
+       if (sub.includes("ECA Lab")) faculty = "G. NAGARJUNA";
         const rolls = Object.keys(attendance).sort();
         let presentRolls = [];
         let absentRolls = [];
