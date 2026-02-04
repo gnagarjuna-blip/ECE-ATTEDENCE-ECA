@@ -161,7 +161,7 @@
         const perc = ((pCount / total) * 100).toFixed(1);
         const dateStr = new Date().toLocaleDateString();
 
-        let msg = `*📊 ATTENDANCE: ECE - ${sec}*\n*📅 Date:* ${dateStr}\n*📘 Subject:* ${sub}\n*📘 Period:* ${per}\n*📈 Attendance:* ${perc}%\n\n`;
+        let msg = `*📊 ATTENDANCE: ECE - ${sec}*\n*📅 Date:* ${dateStr}\n*📘 Subject:* ${sub}\n*📈 Attendance:* ${perc}%\n\n`;
         msg += `*✅ Present:* ${pCount}\n*❌ Absent:* ${absentees.length}\n\n*─── ABSENTEES 🔴 ───*\n`;
         msg += absentees.length > 0 ? absentees.join(", ") : "NIL";
 
