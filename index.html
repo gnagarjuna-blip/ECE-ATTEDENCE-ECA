@@ -3,247 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ECE Attendance - G. Nagarjuna</title>
+    <title>ECE Attendance - Nagarjuna</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        :root { --p-color: #28a745; --a-color: #dc3545; --n-color: #6c757d; }
-        body { background: #f0f2f5; font-family: 'Segoe UI', sans-serif; padding-bottom: 80px; }
-        .sticky-header { position: sticky; top: 0; background: #004085; color: white; z-index: 1000; padding: 10px; border-bottom: 2px solid #ffc107; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
-        .mode-container { background: rgba(255,255,255,0.15); border-radius: 8px; padding: 10px; margin: 8px 0; border: 1px solid rgba(255,255,255,0.2); }
-        .student-card { background: white; border-radius: 8px; margin-bottom: 6px; padding: 12px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; border-left: 6px solid #ccc; transition: 0.2s; }
-        .student-card.is-p { border-left-color: var(--p-color); background: #e8f5e9; }
-        .student-card.is-a { border-left-color: var(--a-color); background: #fce4ec; }
-        .badge-status { padding: 4px 10px; border-radius: 6px; color: white; font-weight: bold; font-size: 0.8rem; min-width: 30px; text-align: center; }
-        .badge-p { background: var(--p-color); }
-        .badge-a { background: var(--a-color); }
-        .badge-n { background: var(--n-color); }
-        .stat-box { text-align: center; }
-        .stat-val { display: block; font-size: 1.1rem; font-weight: 800; }
-        .stat-lbl { font-size: 0.55rem; text-transform: uppercase; opacity: 0.8; }
-        #subject-manual { background: white; color: #004085; border: none; font-size: 0.8rem; font-weight: bold; padding: 4px 8px; border-radius: 4px; width: 100%; }
-        .action-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 10px; display: flex; gap: 10px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 1001; }
+        :root { --p-color: #28a745; --a-color: #dc3545; }
+        body { background: #f4f7f6; padding-bottom: 100px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .header-sticky { position: sticky; top: 0; background: #003366; color: white; z-index: 1000; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-bottom: 4px solid #ffc107; }
+        .student-card { background: white; border-radius: 12px; margin-bottom: 10px; padding: 12px; display: flex; align-items: center; justify-content: space-between; border-left: 6px solid #ccc; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .student-card.is-p { border-left-color: var(--p-color); }
+        .student-card.is-a { border-left-color: var(--a-color); background: #fff5f5; }
+        .btn-call { background: #007bff; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; text-decoration: none; }
+        .btn-call:hover { background: #0056b3; color: white; }
+        .percentage-box { text-align: center; background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.3); }
+        .footer-actions { position: fixed; bottom: 0; width: 100%; background: white; padding: 15px; display: flex; gap: 10px; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body>
 
-<div class="sticky-header">
-    <div class="container p-1">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-            <div>
-                <h6 class="m-0 fw-bold">G. NAGARJUNA</h6>
-                <div style="font-size:0.65rem; color:#ffc107">ECE ATTENDANCE PORTAL</div>
-            </div>
-            <div class="text-end">
-                <span id="perc-display" class="badge bg-warning text-dark fw-bold">0% ATTENDANCE</span>
-            </div>
+<div class="header-sticky">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="mb-0 fw-bold">G. NAGARJUNA</h5>
+            <small class="text-warning">ECE ATTENDANCE SYSTEM</small>
         </div>
-
-        <div class="mode-container">
-            <div class="d-flex justify-content-around">
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="mode" id="modeP" value="P" checked onchange="updateMode()">
-                    <label class="form-check-label fw-bold small" for="modeP">MARK PRESENTEES</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="mode" id="modeA" value="A" onchange="updateMode()">
-                    <label class="form-check-label fw-bold small" for="modeA">MARK ABSENTEES</label>
-                </div>
-            </div>
+        <div class="percentage-box">
+            <div id="perc-num" class="h4 mb-0 fw-bold">100%</div>
+            <div style="font-size: 0.6rem; text-transform: uppercase;">Present</div>
         </div>
-
-        <div class="row g-1 align-items-center mb-2">
-            <div class="col-3">
-                <select id="sec-sel" class="form-select form-select-sm fw-bold" onchange="initList()">
-                    <option value="A">SEC A</option><option value="B">SEC B</option><option value="C">SEC C</option>
-                </select>
-            </div>
-            <div class="col-4">
-                <select id="per-sel" class="form-select form-select-sm" onchange="autoSubject()">
-                    <option value="0">P1 (9:20)</option><option value="1">P2 (10:10)</option>
-                    <option value="2">P3 (11:10)</option><option value="3">P4 (12:00)</option>
-                    <option value="4">P5 (1:30)</option><option value="5">P6 (2:20)</option>
-                    <option value="6">P7 (3:10)</option>
-                </select>
-            </div>
-            <div class="col-5">
-                <input type="text" id="subject-manual" placeholder="Enter Subject Name">
-            </div>
+    </div>
+    
+    <div class="row mt-3 g-2">
+        <div class="col-6">
+            <select id="sec-sel" class="form-select form-select-sm" onchange="initList()">
+                <option value="A">Section A</option><option value="B">Section B</option><option value="C">Section C</option>
+            </select>
         </div>
-
-        <div class="row text-white">
-            <div class="col-4 stat-box"><span id="s-total" class="stat-val">0</span><span class="stat-lbl">Total</span></div>
-            <div class="col-4 stat-box" style="color:#4ade80"><span id="s-p" class="stat-val">0</span><span class="stat-lbl">Present</span></div>
-            <div class="col-4 stat-box" style="color:#f87171"><span id="s-a" class="stat-val">0</span><span class="stat-lbl">Absent</span></div>
+        <div class="col-6">
+            <input type="text" id="subject-name" class="form-control form-control-sm" placeholder="Subject">
         </div>
     </div>
 </div>
 
-<div class="container mt-3" id="list"></div>
+<div class="container mt-3" id="student-list"></div>
 
-<div class="action-bar">
-    <button class="btn btn-primary w-100 fw-bold" onclick="sendReport()">📤 POST REPORT</button>
-    <button class="btn btn-danger w-100 fw-bold" onclick="alertParents()">⚠️ ALERT PARENTS</button>
+<div class="footer-actions">
+    <button class="btn btn-primary w-100 fw-bold" onclick="generateReport()">📤 REPORT (WA)</button>
+    <button class="btn btn-danger w-100 fw-bold" onclick="alertAbsentees()">⚠️ ALERT PARENTS</button>
 </div>
 
 <script>
-    const schedules = {
-        'A': {'MON':['ADC','EMTL','LDICA','ECA','ECA Lab','ECA Lab','ADC'],'TUE':['PTSP','ADC','E','LDICA','EMTL','ECA','LDICA'],'WED':['ECA Lab','ECA Lab','EMTL','ECA','E','LDICA','ADC'],'THU':['E','E','E','LDICA','PTSP','U','ADC'],'FRI':['PTSP','EMTL','ADC','ECA','LDICA','PTSP','EMTL'],'SAT':['ADC','PTSP','EMTL','LDICA','E','NPTEL','LIB']},
-        'B': {'MON':['ECA','EMTL','E','PTSP','LDICA','ADC','PTSP'],'TUE':['E','ADC','LDICA','PTSP','E','E','E'],'WED':['EMTL','ECA','ADC','E','PTSP','EMTL','LDICA'],'THU':['ADC','ECA','EMTL','LDICA','ADC','PTSP','EMTL'],'FRI':['ECA','ADC','EMTL','PTSP','E','LDICA','ADC'],'SAT':['EMTL','PTSP','LDICA','ADC','E','NPTEL','LIB']},
-        'C': {'MON':['ADC','LDICA','ECA','E','E','E','ECA LAB'],'TUE':['PTSP','EMTL','ADC','LDICA','PTSP','EMTL','ADC'],'WED':['ECA','ADC','E','PTSP','EMTL','LDICA','ADC'],'THU':['EMTL','A','ECA','LDICA','E','EMTL','PTSP'],'FRI':['ADC','E','ECA','PTSP','EMTL','ADC','LDICA'],'SAT':['PTSP','EMTL','ADC','LDICA','A','NPTEL','LIB']}
-    };
-
-    // Database with Parent Numbers ("p"). Format: 91 followed by 10 digits.
+    // Database with Fathers' Numbers (Replace with real 10-digit numbers)
    const studentData = {
-        'A': [{"r":"24E11A0401","n":"A.SANDEEP KUMAR","p" : "919059144280"},{"r":"24E11A0402","n":"ABBAS AKSHAYA"},{"r":"24E11A0403","n":"A.Harsha vardhan"},{"r":"24E11A0404","n":"APPALA SRILIKITHA"},{"r":"24E11A0405","n":"BADETI HARSHITH"},{"r":"24E11A0406","n":"BAIRU NAVEEN"},{"r":"24E11A0407","n":"B SURYA TEJA"},{"r":"24E11A0408","n":"BANDI TEJA"},{"r":"24E11A0409","n":"BANOTH RAHUL NAYAK"},{"r":"24E11A0410","n":"BOLLU NANDHINI"},{"r":"24E11A0411","n":"BUDUTHA ARUNKUMAR"},{"r":"24E11A0412","n":"CH.BHARATH KUMAR"},{"r":"24E11A0413","n":"EDLA NIKHIL"},{"r":"24E11A0414","n":"E SHIVA"},{"r":"24E11A0415","n":"PADALA AKASH REDDY"},{"r":"24E11A0416","n":"AMBOTHU SIDDARTH NAYAK"},{"r":"24E11A0417","n":"CHAKRAVARTHULA SHRUTHI"},{"r":"24E11A0418","n":"HANUMANDLA SAMPATH KUMAR"},{"r":"24E11A0419","n":"ITHARAJU JYOSHNA"},{"r":"24E11A0420","n":"INDRVATH RAHUL"},{"r":"24E11A0421","n":"JADI ANUSHA"},{"r":"24E11A0422","n":"K.ABHISHEK"},{"r":"24E11A0423","n":"KAPPARI GIRIDHAR"},{"r":"24E11A0424","n":"KASA PAVANI"},{"r":"24E11A0425","n":"MALOTH GANDHI"},{"r":"24E11A0426","n":"KATAKAM VENKATA MANOJ KUMAR"},{"r":"24E11A0427","n":"KESARALA SAHITHI"},{"r":"24E11A0428","n":"KORRA RAMLAL"},{"r":"24E11A0429","n":"Kota Madhuri"},{"r":"24E11A0430","n":"K RAMU"},{"r":"24E11A0431","n":"KUNCHALARUPADEVI"},{"r":"24E11A0432","n":"KURRI THARUN"},{"r":"24E11A0433","n":"LAKKADI NARSIMHAREDDY"},{"r":"24E11A0434","n":"VACHEPALLI VINEELA"},{"r":"24E11A0435","n":"Madella vinith"},{"r":"24E11A0436","n":"MANNE MOUNIKA"},{"r":"24E11A0437","n":"MARIPELLI SAI KIRAN"},{"r":"24E11A0438","n":"Mekala. Bhargavi"},{"r":"24E11A0439","n":"MIDIDODDI ABHINAV"},{"r":"24E11A0440","n":"MUPPANA JAHNAVI"},{"r":"24E11A0441","n":"JULAKANTI ABHIRAM REDDY"},{"r":"24E11A0442","n":"NETHALLA SAI KUMAR"},{"r":"24E11A0443","n":"PAGILLA.BHARGAVI"},{"r":"24E11A0445","n":"POREDDY ANUSHA"},{"r":"24E11A0446","n":"POTTUMUTHU ADHI"},{"r":"24E11A0447","n":"PUNNA KRISHNA TEJA"},{"r":"24E11A0448","n":"PUNNA NAVEEN"},{"r":"24E11A0449","n":"MOHAMMED MAAZ ALI"},{"r":"24E11A0450","n":"C HARI PRASAD"},{"r":"24E11A0451","n":"SRIPADHA RISHI VARDHAN"},{"r":"24E11A0452","n":"TANGELLA MEGHANA REDDY"},{"r":"24E11A0453","n":"V Karthik"},{"r":"24E11A0454","n":"Vajrapu Raghuvaran"},{"r":"24E11A0455","n":"Veera pogula thirupathi"},{"r":"25E15A0401","n":"KUKKALA SAI KIRTHAN"},{"r":"25E15A0402","n":"LAKUMALLA AKASH"},{"r":"25E15A0403","n":"HANUMANDLA SAMANVIKA"},{"r":"25E15A0404","n":"KALVA SHIVA KRISHNA"},{"r":"25E15A0405","n":"UDARI SARAYU"},{"r":"25E15A0406","n":"RASAMMALLA SAI KUMAR"},{"r":"25E15A0407","n":"CHEGONDA SAITEJA"},{"r":"25E15A0408","n":"BOLLAVENA PADMAJA"},{"r":"25E15A0409","n":"AMMULA RAMYA"},{"r":"25E15A0410","n":"BASUTHKAR ABHISHEK"},{"r":"25E15A0411","n":"G GOVARDHAN"},{"r":"25E15A0412","n":"KURVA RAMESH"},{"r":"25E15A0413","n":"B SAI CHARAN REDDY"},{"r":"25E15A0414","n":"GANGAPURAM PRAVEEN"},{"r":"25E15A0415","n":"REVANTH RAJ"}],
+        'A': [{"r":"24E11A0401","n":"A.SANDEEP KUMAR"},{"r":"24E11A0402","n":"ABBAS AKSHAYA"},{"r":"24E11A0403","n":"A.Harsha vardhan"},{"r":"24E11A0404","n":"APPALA SRILIKITHA"},{"r":"24E11A0405","n":"BADETI HARSHITH"},{"r":"24E11A0406","n":"BAIRU NAVEEN"},{"r":"24E11A0407","n":"B SURYA TEJA"},{"r":"24E11A0408","n":"BANDI TEJA"},{"r":"24E11A0409","n":"BANOTH RAHUL NAYAK"},{"r":"24E11A0410","n":"BOLLU NANDHINI"},{"r":"24E11A0411","n":"BUDUTHA ARUNKUMAR"},{"r":"24E11A0412","n":"CH.BHARATH KUMAR"},{"r":"24E11A0413","n":"EDLA NIKHIL"},{"r":"24E11A0414","n":"E SHIVA"},{"r":"24E11A0415","n":"PADALA AKASH REDDY"},{"r":"24E11A0416","n":"AMBOTHU SIDDARTH NAYAK"},{"r":"24E11A0417","n":"CHAKRAVARTHULA SHRUTHI"},{"r":"24E11A0418","n":"HANUMANDLA SAMPATH KUMAR"},{"r":"24E11A0419","n":"ITHARAJU JYOSHNA"},{"r":"24E11A0420","n":"INDRVATH RAHUL"},{"r":"24E11A0421","n":"JADI ANUSHA"},{"r":"24E11A0422","n":"K.ABHISHEK"},{"r":"24E11A0423","n":"KAPPARI GIRIDHAR"},{"r":"24E11A0424","n":"KASA PAVANI"},{"r":"24E11A0425","n":"MALOTH GANDHI"},{"r":"24E11A0426","n":"KATAKAM VENKATA MANOJ KUMAR"},{"r":"24E11A0427","n":"KESARALA SAHITHI"},{"r":"24E11A0428","n":"KORRA RAMLAL"},{"r":"24E11A0429","n":"Kota Madhuri"},{"r":"24E11A0430","n":"K RAMU"},{"r":"24E11A0431","n":"KUNCHALARUPADEVI"},{"r":"24E11A0432","n":"KURRI THARUN"},{"r":"24E11A0433","n":"LAKKADI NARSIMHAREDDY"},{"r":"24E11A0434","n":"VACHEPALLI VINEELA"},{"r":"24E11A0435","n":"Madella vinith"},{"r":"24E11A0436","n":"MANNE MOUNIKA"},{"r":"24E11A0437","n":"MARIPELLI SAI KIRAN"},{"r":"24E11A0438","n":"Mekala. Bhargavi"},{"r":"24E11A0439","n":"MIDIDODDI ABHINAV"},{"r":"24E11A0440","n":"MUPPANA JAHNAVI"},{"r":"24E11A0441","n":"JULAKANTI ABHIRAM REDDY"},{"r":"24E11A0442","n":"NETHALLA SAI KUMAR"},{"r":"24E11A0443","n":"PAGILLA.BHARGAVI"},{"r":"24E11A0445","n":"POREDDY ANUSHA"},{"r":"24E11A0446","n":"POTTUMUTHU ADHI"},{"r":"24E11A0447","n":"PUNNA KRISHNA TEJA"},{"r":"24E11A0448","n":"PUNNA NAVEEN"},{"r":"24E11A0449","n":"MOHAMMED MAAZ ALI"},{"r":"24E11A0450","n":"C HARI PRASAD"},{"r":"24E11A0451","n":"SRIPADHA RISHI VARDHAN"},{"r":"24E11A0452","n":"TANGELLA MEGHANA REDDY"},{"r":"24E11A0453","n":"V Karthik"},{"r":"24E11A0454","n":"Vajrapu Raghuvaran"},{"r":"24E11A0455","n":"Veera pogula thirupathi"},{"r":"25E15A0401","n":"KUKKALA SAI KIRTHAN"},{"r":"25E15A0402","n":"LAKUMALLA AKASH"},{"r":"25E15A0403","n":"HANUMANDLA SAMANVIKA"},{"r":"25E15A0404","n":"KALVA SHIVA KRISHNA"},{"r":"25E15A0405","n":"UDARI SARAYU"},{"r":"25E15A0406","n":"RASAMMALLA SAI KUMAR"},{"r":"25E15A0407","n":"CHEGONDA SAITEJA"},{"r":"25E15A0408","n":"BOLLAVENA PADMAJA"},{"r":"25E15A0409","n":"AMMULA RAMYA"},{"r":"25E15A0410","n":"BASUTHKAR ABHISHEK"},{"r":"25E15A0411","n":"G GOVARDHAN"},{"r":"25E15A0412","n":"KURVA RAMESH"},{"r":"25E15A0413","n":"B SAI CHARAN REDDY"},{"r":"25E15A0414","n":"GANGAPURAM PRAVEEN"},{"r":"25E15A0415","n":"REVANTH RAJ"}],
         'B': [{"r":"24E11A0456","n":"AMBATI VARUN KUMAR"},{"r":"24E11A0457","n":"ATHI SWATHI"},{"r":"24E11A0458","n":"BADIGAR SAI DHANUSH"},{"r":"24E11A0459","n":"BANDARU THIRUPATHI SWAMY"},{"r":"24E11A0460","n":"BANOTHU NARASIMHA NAIK"},{"r":"24E11A0461","n":"BOLLEDULLA RUDRANSH NATH"},{"r":"24E11A0462","n":"BURA AKHIL"},{"r":"24E11A0463","n":"CHATAMONI AKHILA"},{"r":"24E11A0464","n":"CHEGURI SHIVA KUMAR"},{"r":"24E11A0465","n":"DHAMASTHAPURAM AKSHAYA"},{"r":"24E11A0466","n":"DHARAVATH NATHEEP NAIK"},{"r":"24E11A0467","n":"DHARAVATH THANUSREE"},{"r":"24E11A0468","n":"GADDALA MADHAVA SAIRAM"},{"r":"24E11A0469","n":"GADDAM DEEPAK"},{"r":"24E11A0470","n":"GOLLA ADITYA"},{"r":"24E11A0471","n":"GOLLENA KRISHNA"},{"r":"24E11A0472","n":"JANI THOTAPALLY"},{"r":"24E11A0473","n":"G SUNIL"},{"r":"24E11A0474","n":"SINGARAM SUNNY ABISHEK"},{"r":"24E11A0475","n":"KOMATI ARUN KUMAR"},{"r":"24E11A0476","n":"GURAJALA SHRUTHIKA"},{"r":"24E11A0477","n":"THAMMALI SAI BHAVANA"},{"r":"24E11A0478","n":"Merugu shiva"},{"r":"24E11A0479","n":"JOGU NISHANTH"},{"r":"24E11A0480","n":"Kadari Udaykiran Reddy"},{"r":"24E11A0481","n":"KALAKUNTLA SAI GANESH"},{"r":"24E11A0482","n":"KALAPPAGARI ABHINAV"},{"r":"24E11A0483","n":"KANKALA NAGARANI"},{"r":"24E11A0484","n":"KATHI ANITHA"},{"r":"24E11A0485","n":"KODELA THARUN"},{"r":"24E11A0486","n":"KOLAN CHARAN REDDY"},{"r":"24E11A0487","n":"KOTAGIRI JASHWANTH CHARY"},{"r":"24E11A0488","n":"PEDDAPURAM AKHIL"},{"r":"24E11A0489","n":"Kurakula Bharath Kumar"},{"r":"24E11A0490","n":"LENKALAPALLY PRANAY TEJA"},{"r":"24E11A0491","n":"L PRUDHVIRAJU"},{"r":"24E11A0492","n":"MAIDAM AKSHAYA"},{"r":"24E11A0493","n":"NADIKUDA DEVI SRI PRASAD"},{"r":"24E11A0494","n":"NAKIREKANTI BHANU CHANDRA PRASAD"},{"r":"24E11A0495","n":"NAKKA DHANRAJ"},{"r":"24E11A0496","n":"NENAVATH GUNDA"},{"r":"24E11A0497","n":"PUTTA RAVICHANDRIKA"},{"r":"24E11A0498","n":"PALLE MIKSHITHA"},{"r":"24E11A0499","n":"PANNALA NIMITHA"},{"r":"24E11A04A0","n":"PENUGONDA HARSHITH"},{"r":"24E11A04A1","n":"SILIVERU SIDDHARTH"},{"r":"24E11A04A2","n":"SHAIK FAISAL AIYAN"},{"r":"24E11A04A3","n":"SHIVANI SANTHOSHI KUMARI"},{"r":"24E11A04A4","n":"THIRTHIYAL VARSHITH SAI"},{"r":"24E11A04A5","n":"THORNE ASHMITHA"},{"r":"24E11A04A6","n":"U.AKHILA"},{"r":"24E11A04A7","n":"Goura pooja"},{"r":"24E11A04A8","n":"PASNURI VENKATA RAMANA"},{"r":"24E11A04A9","n":"VUSHAKOLA RAHUL"},{"r":"24E11A04B0","n":"YESHALA DEEPAK"},{"r":"25E15A0416","n":"KOYALKAR SHRUTHIKA"},{"r":"25E15A0417","n":"MANDLA LOHITHA"},{"r":"25E15A0418","n":"RAVULA VAISHNAVI"},{"r":"25E15A0419","n":"V KALYAN"},{"r":"25E15A0420","n":"PATHURI VAISHNAVI"},{"r":"25E15A0421","n":"BADIKELA HARI PRAKASH"},{"r":"25E15A0422","n":"RAGULA MYKRANTH"},{"r":"25E15A0423","n":"SILLA BHANU PRAKASH"},{"r":"25E15A0424","n":"M SANJAY"},{"r":"25E15A0425","n":"BEJJENKI LAHARI"},{"r":"25E15A0426","n":"D JAI SUBHASH"},{"r":"25E15A0427","n":"M RAMCHARAN"},{"r":"25E15A0428","n":"REPALLE VAGDEVI"}],
         'C': [{"r":"24E11A04B1","n":"ADUPA HARINI"},{"r":"24E11A04B2","n":"ANANTHULA VAISHNAVI"},{"r":"24E11A04B3","n":"ANDANKEE JAGADEESH"},{"r":"24E11A04B4","n":"Andekar Shiva Kumar"},{"r":"24E11A04B5","n":"ANNAM TEJASWINI"},{"r":"24E11A04B6","n":"BALAM MANISAI"},{"r":"24E11A04B8","n":"BHUKYAADITYA"},{"r":"24E11A04B9","n":"B MAHENDAR REDDY"},{"r":"24E11A04C0","n":"BURRA RAMU"},{"r":"24E11A04C1","n":"CHINTAKUNTA SAI DEEPAK"},{"r":"24E11A04C2","n":"SHAIK SAMEER"},{"r":"24E11A04C3","n":"MEKA SONI"},{"r":"24E11A04C4","n":"DONTHAM SNEHITHA"},{"r":"24E11A04C5","n":"KOTARI ARYA NAVISH"},{"r":"24E11A04C6","n":"GADDAMEEDI AMULYA"},{"r":"24E11A04C7","n":"GATLA TRIVENI"},{"r":"24E11A04C8","n":"GODASU PREETHAM KUMAR"},{"r":"24E11A04C9","n":"THADASINA CHARAN REDDY"},{"r":"24E11A04D0","n":"GUNTOJU SAI CHANDU"},{"r":"24E11A04D1","n":"JAIDUPALLY SRIHITHA REDDY"},{"r":"24E11A04D2","n":"KADUSU NAGARAJU"},{"r":"24E11A04D3","n":"K AKSHAYA"},{"r":"24E11A04D4","n":"THOGARI SRAVANI"},{"r":"24E11A04D5","n":"KARNATI PRAVALIKA"},{"r":"24E11A04D6","n":"KONDAGORLAMADHAVI"},{"r":"24E11A04D7","n":"KONDAPALLI HARSHA VARDHAN DATTA"},{"r":"24E11A04D8","n":"U HARSHITHA"},{"r":"24E11A04D9","n":"KUNSOTH BHARATH"},{"r":"24E11A04E0","n":"KURUVA MAHESH"},{"r":"24E11A04E1","n":"LODDA SAI CHARAN"},{"r":"24E11A04E2","n":"Likki vivek vardhan"},{"r":"24E11A04E4","n":"N.ABHISHEK"},{"r":"24E11A04E5","n":"VANKADOTHU KAVILASH"},{"r":"24E11A04E6","n":"YAJJALA DHANANJAY"},{"r":"24E11A04E7","n":"TEJAVATH NIKHIL"},{"r":"25E15A0456","n":"SURVI PRANEETH"},{"r":"24E11A04B7","n":"BANOTH KARAN"},{"r":"24E11A04E8","n":"PURUGULA VAISHNAVI"},{"r":"24E11A04E9","n":"RADARAPU AJITHKUMARq"},{"r":"24E11A04F0","n":"BAMAN NANDULAL"},{"r":"24E11A04F1","n":"RAVULA PAVAN"},{"r":"24E11A04F2","n":"R. MAHESH VARDHAN"},{"r":"25E15A0429","n":"SURUBULA SANJAY"},{"r":"25E15A0430","n":"GANJI PRAGATHI"},{"r":"25E15A0431","n":"YAMJALA BHUVANA CHANDRA"},{"r":"25E15A0432","n":"GADIGE SHAILAJA"},{"r":"25E15A0433","n":"AKKAVATHRI NAVEENA"},{"r":"25E15A0434","n":"CHINTAKUNTA LAHARIKA"},{"r":"25E15A0435","n":"MOHAMMED SAMEERUDDIN"},{"r":"25E15A0436","n":"MEGAVATH PAVAN"},{"r":"25E15A0437","n":"JATOTH DONA"},{"r":"25E15A0438","n":"DHARAVATH SAINAYAK"},{"r":"25E15A0439","n":"SAKA HARINI"},{"r":"25E15A0440","n":"PASUPULA DEEPIKA"},{"r":"25E15A0441","n":"KILARI THARUN"},{"r":"25E15A0442","n":"NANDALA VASAVI"},{"r":"25E15A0443","n":"PANDALA AKSHITHA"},{"r":"25E15A0444","n":"KANAKATI SPANDANA"},{"r":"25E15A0445","n":"GOWLIKAR HARSHITA"},{"r":"25E15A0446","n":"MANTRI AMULYA"},{"r":"25E15A0447","n":"OLLALA SOUJANYA"},{"r":"25E15A0448","n":"GADASANDHU AKSHITHA"},{"r":"25E15A0449","n":"VANGA AKASH"},{"r":"25E15A0450","n":"PALLE MOUNIHARIKA"},{"r":"25E15A0451","n":"VANGA ASHWINI"},{"r":"25E15A0452","n":"B RAVI TEJA"},{"r":"25E15A0453","n":"S ABHILASH"},{"r":"25E15A0454","n":"B MADHUKAR"},{"r":"25E15A0455","n":"I VAISHNAVI"}]
     };
 
     let attendance = {};
-    let markMode = 'P';
-
-    function updateMode() {
-        markMode = document.querySelector('input[name="mode"]:checked').value;
-    }
 
     function initList() {
         const sec = document.getElementById('sec-sel').value;
-        const listDiv = document.getElementById('list');
-        listDiv.innerHTML = '';
+        const container = document.getElementById('student-list');
+        container.innerHTML = '';
         attendance = {};
-        
-        const students = studentData[sec];
-        document.getElementById('s-total').innerText = students.length;
-
-        students.forEach(s => {
-            attendance[s.r] = '0'; 
-            const card = document.createElement('div');
-            card.className = 'student-card';
-            card.id = `card-${s.r}`;
-            card.onclick = () => toggleStudent(s.r);
-            card.innerHTML = `
-                <div>
-                    <div class="fw-bold" style="font-size:0.85rem">${s.r}</div>
-                    <div class="text-muted" style="font-size:0.7rem">${s.n}</div>
-                </div>
-                <div id="status-${s.r}" class="badge-status badge-n">0</div>
-            `;
-            listDiv.appendChild(card);
-        });
-        updateStats();
-        autoSubject();
-    }
-
-    function toggleStudent(roll) {
-        if (attendance[roll] === markMode) {
-            attendance[roll] = '0';
-        } else {
-            attendance[roll] = markMode;
-        }
-        refreshUI(roll);
-        updateStats();
-    }
-
-    function refreshUI(roll) {
-        const card = document.getElementById(`card-${roll}`);
-        const badge = document.getElementById(`status-${roll}`);
-        const status = attendance[roll];
-        card.classList.remove('is-p', 'is-a');
-        if(status === '0') {
-            badge.className = 'badge-status badge-n';
-            badge.innerText = '0';
-        } else {
-            card.classList.add(status === 'P' ? 'is-p' : 'is-a');
-            badge.className = `badge-status badge-${status.toLowerCase()}`;
-            badge.innerText = status;
-        }
-    }
-
-    function updateStats() {
-        const sec = document.getElementById('sec-sel').value;
-        const total = studentData[sec].length;
-        const rolls = Object.keys(attendance);
-        let pCount = 0;
-        let aCount = 0;
-
-        rolls.forEach(r => {
-            if (markMode === 'P') {
-                if (attendance[r] === 'P') pCount++; else aCount++;
-            } else {
-                if (attendance[r] === 'A') aCount++; else pCount++;
-            }
-        });
-
-        const percentage = ((pCount / total) * 100).toFixed(1);
-        document.getElementById('s-p').innerText = pCount;
-        document.getElementById('s-a').innerText = aCount;
-        document.getElementById('perc-display').innerText = `${percentage}% ATTENDANCE`;
-    }
-
-    function autoSubject() {
-        const sec = document.getElementById('sec-sel').value;
-        const per = document.getElementById('per-sel').value;
-        const day = ['SUN','MON','TUE','WED','THU','FRI','SAT'][new Date().getDay()];
-        const sched = schedules[sec][day] || schedules[sec]['MON'];
-        document.getElementById('subject-manual').value = sched[per] || "FREE";
-    }
-
-    function getReportData() {
-        const sec = document.getElementById('sec-sel').value;
-        const perIdx = document.getElementById('per-sel').value;
-        const perText = document.getElementById('per-sel').options[perIdx].text;
-        const sub = document.getElementById('subject-manual').value.toUpperCase();
-        const total = studentData[sec].length;
-        
-        let presentRolls = [];
-        let absentList = []; // Array of objects {r, n, p}
 
         studentData[sec].forEach(s => {
-            const status = attendance[s.r];
-            let isPresent = (markMode === 'P') ? (status === 'P') : (status !== 'A');
-            
-            if (isPresent) {
-                presentRolls.push(s.r);
-            } else {
-                absentList.push(s);
-            }
+            attendance[s.r] = 'P'; // Default to Present
+            const card = document.createElement('div');
+            card.className = 'student-card is-p';
+            card.id = `card-${s.r}`;
+            card.innerHTML = `
+                <div onclick="toggleAttendance('${s.r}')" style="flex-grow: 1;">
+                    <div class="fw-bold">${s.r}</div>
+                    <small class="text-muted">${s.n}</small>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <span id="label-${s.r}" class="badge bg-success">P</span>
+                    <a href="tel:${s.p}" class="btn-call">📞</a>
+                </div>
+            `;
+            container.appendChild(card);
         });
-
-        const perc = ((presentRolls.length / total) * 100).toFixed(1);
-        return { sec, perText, sub, presentRolls, absentList, perc, total };
+        updateCalculations();
     }
 
-    function sendReport() {
-        const d = getReportData();
-        const dateStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    function toggleAttendance(roll) {
+        const card = document.getElementById(`card-${roll}`);
+        const label = document.getElementById(`label-${roll}`);
         
-        let msg = `*📊 ATTENDANCE: ECE - ${d.sec}*\n`;
-        msg += `*📅 Date:* ${dateStr}\n*⏰ Period:* ${d.perText}\n*📘 Subject:* ${d.sub}\n\n`;
-        msg += `*✅ Present:* ${d.presentRolls.length}\n*❌ Absent:* ${d.absentList.length}\n`;
-        msg += `*📈 Percentage:* ${d.perc}%\n\n`;
-        msg += `*─── ABSENTEES 🔴 ───*\n`;
-
-        if (d.absentList.length > 0) {
-            d.absentList.forEach(s => { msg += `• ${s.r}\n`; });
+        if (attendance[roll] === 'P') {
+            attendance[roll] = 'A';
+            card.classList.replace('is-p', 'is-a');
+            label.className = 'badge bg-danger';
+            label.innerText = 'ABSENT';
         } else {
-            msg += "*NIL (All Present)*";
+            attendance[roll] = 'P';
+            card.classList.replace('is-a', 'is-p');
+            label.className = 'badge bg-success';
+            label.innerText = 'P';
         }
-
-        window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+        updateCalculations();
     }
 
-    function alertParents() {
-        const d = getReportData();
-        if (d.absentList.length === 0) return alert("No absentees to notify!");
+    function updateCalculations() {
+        const sec = document.getElementById('sec-sel').value;
+        const total = studentData[sec].length;
+        const present = Object.values(attendance).filter(v => v === 'P').length;
+        const perc = Math.round((present / total) * 100);
+        document.getElementById('perc-num').innerText = perc + '%';
+    }
 
-        if (confirm(`This will open WhatsApp for ${d.absentList.length} parents. Continue?`)) {
-            d.absentList.forEach((s, index) => {
-                setTimeout(() => {
-                    const msg = `Dear Parent, your child ${s.n} (${s.r}) is ABSENT for the ${d.perText} (${d.sub}) class today (${new Date().toLocaleDateString()}). - ECE Dept.`;
-                    window.open(`https://wa.me/${s.p}?text=${encodeURIComponent(msg)}`, '_blank');
-                }, index * 1500); // 1.5s delay to prevent browser blocking
-            });
-        }
+    function generateReport() {
+        const sec = document.getElementById('sec-sel').value;
+        const sub = document.getElementById('subject-name').value || "Class";
+        const absentees = studentData[sec].filter(s => attendance[s.r] === 'A');
+        const total = studentData[sec].length;
+        const perc = Math.round(((total - absentees.length) / total) * 100);
+
+        let msg = `*📊 ATTENDANCE REPORT: SEC ${sec}*\n`;
+        msg += `*📘 Subject:* ${sub}\n`;
+        msg += `*📈 Percentage:* ${perc}%\n`;
+        msg += `*✅ Present:* ${total - absentees.length}\n`;
+        msg += `*❌ Absent:* ${absentees.length}\n\n`;
+        msg += `*ABSENTEES LIST:*\n`;
+        
+        absentees.forEach((s, i) => { msg += `${i+1}. ${s.r} (${s.n})\n`; });
+
+        window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
+    }
+
+    function alertAbsentees() {
+        const sec = document.getElementById('sec-sel').value;
+        const absentees = studentData[sec].filter(s => attendance[s.r] === 'A');
+        
+        if(absentees.length === 0) return alert("No absentees to notify.");
+
+        alert(`Ready to notify ${absentees.length} parents. After you close this, click the 📞 blue button next to RED cards to call fathers instantly.`);
     }
 
     initList();
